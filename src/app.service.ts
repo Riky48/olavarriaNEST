@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
+export interface iTrack {
+  id:number,
+  title:string,
+  duration:number,
+  artist:string,
+}
+
+
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getTracks(): string {
+    return "hola";
   }
 }
