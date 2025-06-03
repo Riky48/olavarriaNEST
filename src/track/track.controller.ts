@@ -1,16 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track } from './track.interface';
 
-@Controller('track')
+@Controller()
 export class TrackController {
-    
-
     constructor(private readonly trackService: TrackService) {}
-
-        @Get()
+        @Get('/tracks')
         getTracks(): Promise<Track[]> {
             return this.trackService.getTracks();
+        }
+
+        @Get('/tracks/:id')
+        getTracksById(@Param('id') id:number): Promise<Track> {
+            return this.trackService.getTrackById(id);
         }
     }
 
