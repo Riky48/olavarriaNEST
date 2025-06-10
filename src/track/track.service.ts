@@ -1,22 +1,72 @@
 import { Injectable } from '@nestjs/common';
 import { Track } from './track.interface';
 
-const BASE_URL = 'http://localhost:3030/tracks';
+const BASE_URL = 'http://localhost:3030/tracks/';
 @Injectable()
 export class TrackService {
-  async  getTracks(): Promise<Track[]> {
-    const res = await fetch(BASE_URL);
-    const parsed = await res.json();
+  async createTrack(track: Track): Promise<Track> {
+    const idn = await this.setId();
+    //const newTrack={id,...track};
+    const newTrack: Track = {
+      id: idn,
+      title: track.title,
+      duration: track.duration,
+      artist: track.artist,
+    };
+    const res = await fetch(BASE_URL, {
+      method: 'POST',
+      body: JSON.stringify(newTrack),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const parsed=await res.json();
     return parsed;
   }
- async getTrackById(id: number): Promise<Track> {
+
+  private async setId(): Promise<number> {
+    const tracks = await this.getTracks();
+    const id = tracks[tracks.length - 1].id + 1;
+    //=tracks[2]
+    return id; //4
+  }
+
+  async getTrackById(id: number): Promise<Track> {
     const res = await fetch(BASE_URL + id);
     const parsed = await res.json();
     return parsed;
   }
-     
- }
 
- 
-   
-  
+  async getTracks(): Promise<Track[]> {
+    const res = await fetch(BASE_URL);
+    const parsed = await res.json();
+    return parsed;
+  }
+
+  async deleteTrackById(id: number): Promise<Track> {
+    const res = await fetch(BASE_URL + id, {
+      method: 'DELETE',
+    });
+    const parsed = await res.json();
+    return parsed;
+  }
+
+  async updateTrackById(id: number, body: Track): Promise<Track | void> {
+    const isTrack = await this.getTrackById(id);
+    if (!Object.keys(isTrack).length) 
+      return;
+      const updateTrack = {...body, id};
+      console.log('Pista Actualizada', updateTrack.title);
+      const res = await fetch(BASE_URL + id, {
+        method: 'PUT',
+        body: JSON.stringify(updateTrack),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const parsed = await res.json();
+      return parsed;
+    
+    
+  }
+}
